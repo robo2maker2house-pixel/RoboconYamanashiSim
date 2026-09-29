@@ -91,6 +91,9 @@ public class IndependentSteerGolfRobotController : MonoBehaviour
     [SerializeField] private bool showOperationGuide = true;
     [SerializeField, HideInInspector] private int configurationVersion;
 
+    private GUIStyle operationGuideStyle;
+    private readonly GUIContent operationGuideContent = new GUIContent();
+
     private ArticulationBody rootBody;
     private ArticulationBody cameraTilt;
     private ArticulationBody cameraDriveGear;
@@ -740,6 +743,17 @@ public class IndependentSteerGolfRobotController : MonoBehaviour
         if (!showOperationGuide)
             return;
 
+        if (operationGuideStyle == null)
+        {
+            operationGuideStyle = new GUIStyle(GUI.skin.box)
+            {
+                alignment = TextAnchor.UpperLeft,
+                fontSize = 13,
+                wordWrap = true,
+                padding = new RectOffset(10, 10, 8, 8)
+            };
+        }
+
         string catchState = clubIsCaptured ? "捕捉中" : "未捕捉";
 
         string guide =
@@ -751,6 +765,13 @@ public class IndependentSteerGolfRobotController : MonoBehaviour
             $"キャッチ実測 {potentiometerValue:0} / 指令 {catchAnalogTarget:0}  （{catchState}）\n" +
             "R : 機構リセット      F1 : この表示を隠す";
 
-        GUI.Box(new Rect(15f, 15f, 470f, 165f), guide);
+        operationGuideContent.text = guide;
+
+        const float margin = 10f;
+        float width = Mathf.Min(430f, Mathf.Max(220f, Screen.width - margin * 2f));
+        float height = operationGuideStyle.CalcHeight(operationGuideContent, width);
+        height = Mathf.Min(height, Mathf.Max(80f, Screen.height - margin * 2f));
+
+        GUI.Box(new Rect(margin, margin, width, height), operationGuideContent, operationGuideStyle);
     }
 }
